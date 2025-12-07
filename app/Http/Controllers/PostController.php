@@ -42,26 +42,23 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-        // 1. [Lecture 08] 验证输入
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'type'        => 'required|in:0,1',
-            'age'         => 'required|integer|min:0|max:100', // 必须包含
-            'dob'         => 'nullable|date',                   // 允许为空
-            'birth_place' => 'nullable|string|max:255',         // 允许为空
+            'age'         => 'required|integer|min:0|max:100',
+            'dob'         => 'nullable|date',          
+            'birth_place' => 'nullable|string|max:255',
             'location'    => 'required|string|max:255',
             'description' => 'required|string',
             'photo'       => 'required|file|image|max:2048',
         ]);
 
-        // 2. 创建 Post 记录 [关键修改点]
-        // 使用 $validated 数组直接赋值，这样 age, dob, birth_place 都会自动填入
-        // 前提是：你已经在 app/Models/Post.php 的 $fillable 数组里加了这些字段
+        // 创建 Post 记录
         $post = new Post($validated);
-        $post->user_id = Auth::id(); // user_id 不在表单里，需要单独赋值
+        $post->user_id = Auth::id();
         $post->save(); 
 
-        // 3. [Lecture 07 核心] 处理文件上传
+        // 处理文件上传
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');
             $path = $file->store('uploads'); 
@@ -74,7 +71,6 @@ class PostController extends Controller
             $upload->save();
         }
 
-        // 4. 反馈
         session()->flash('success', 'Report created successfully.');
 
         return redirect()->route('dashboard');
@@ -96,16 +92,15 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        // [Lecture 08/Auth] 简单的权限检查：只有作者或管理员能删除
         $this->authorize('delete', $post);
 
-        // 1. 删除关联的图片文件 (清理磁盘空间)
+        // 删除关联的图片文件 (清理磁盘空间)
         if ($post->upload) {
             Storage::delete($post->upload->path);
             $post->upload->delete(); // 删除 uploads 表记录
         }
 
-        // 2. 删除帖子
+        // 删除帖子
         $post->delete();
 
         session()->flash('success', '记录已删除。');

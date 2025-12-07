@@ -16,6 +16,6 @@ class IsAdmin
         }
 
         // 否则踢回首页或报错
-        abort(403, '非管理员禁止入内');
+        abort(403, 'Non-administrators are prohibited from entering');
     }
 }
