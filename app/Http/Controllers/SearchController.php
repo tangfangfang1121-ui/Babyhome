@@ -11,7 +11,7 @@ public function index(Request $request)
     {
         $query = Post::with('upload');
 
-        // 1. 关键词搜索 (升级版：现在也能搜 Birth Place 了)
+        // 1. 关键词搜索
         if ($request->filled('keyword')) {
             $keyword = $request->keyword;
             $query->where(function($q) use ($keyword) {

@@ -16,7 +16,7 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    // 关联：一个帖子有一个主要图片 (符合Lecture 07架构) [cite: 1451, 1493]
+    // 关联：一个帖子有一个主要图片
     public function upload() {
         return $this->hasOne(Upload::class);
     }
